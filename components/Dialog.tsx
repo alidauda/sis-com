@@ -12,11 +12,9 @@ import {
 import { ReactNode, useState } from 'react';
 
 export default function DialogDemo({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(true);
   return (
     <div>
-      <button onClick={() => setOpen((item) => !item)}>click</button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open>
         <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
             <DialogDescription className='text-center'>

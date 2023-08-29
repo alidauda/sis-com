@@ -11,6 +11,11 @@ datasource db {
   relationMode = "prisma"
 }
 
+enum RoleTypes {
+  USER
+  ADMIN
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -49,6 +54,9 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  roles         RoleTypes @default(USER)
+  cart          Cart?
+  orders        Order?
 }
 
 model VerificationToken {
@@ -57,4 +65,55 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       Int
+  description String
+  image       String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  quantity    Int
+}
+
+model Cart {
+  id String @id @default(cuid())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cartItems CartItem[]
+
+  @@index([userId])
+}
+
+model CartItem {
+  id String @id @default(cuid())
+
+  quantity Int
+
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cartId])
+  @@index([orderId])
+}
+
+model Order {
+  id        String     @id @default(cuid())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  CartItems CartItem[]
+
+  @@index([userId])
 }
