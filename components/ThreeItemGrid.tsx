@@ -20,7 +20,10 @@ function ThreeItemGridItem({
           : 'md:col-span-2 md:row-span-1'
       }
     >
-      <Link className='relative block aspect-square h-full w-full' href={`#`}>
+      <Link
+        className='relative block aspect-square h-full w-full'
+        href={`/product/${item.id}`}
+      >
         <GridTileImage
           src={item.image}
           fill

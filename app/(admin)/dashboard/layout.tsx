@@ -1,8 +1,8 @@
 'use client';
 import NextAuthProvider from '@/session/session';
+import ReactQueryHelper from '@/utils/react-query';
 import Link from 'next/link';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-const queryClient = new QueryClient();
+
 export default function AdminLayout({
   children,
 }: {
@@ -11,7 +11,7 @@ export default function AdminLayout({
   return (
     <div>
       <NextAuthProvider>
-        <QueryClientProvider client={queryClient}>
+        <ReactQueryHelper>
           <aside
             id='default-sidebar'
             className='fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0'
@@ -129,7 +129,7 @@ export default function AdminLayout({
               {children}
             </div>
           </div>
-        </QueryClientProvider>
+        </ReactQueryHelper>
       </NextAuthProvider>
     </div>
   );

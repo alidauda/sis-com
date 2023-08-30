@@ -1,16 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { ReadonlyURLSearchParams } from 'next/navigation';
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+export const createUrl = (
+  pathname: string,
+  params: URLSearchParams | ReadonlyURLSearchParams
+) => {
+  const paramsString = params.toString();
+  const queryString = `${paramsString.length ? '?' : ''}${paramsString}`;
+
+  return `${pathname}${queryString}`;
 };
-
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log:
-      process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
-  });
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
