@@ -1,7 +1,7 @@
 import { getServerAuthSession, prisma } from '@/utils/auth';
 import { NextResponse } from 'next/server';
 
-export default async function Get() {
+export async function GET() {
   const session = await getServerAuthSession();
   if (!session) return NextResponse.json('unauthorized');
 
@@ -9,6 +9,14 @@ export default async function Get() {
     where: {
       userId: session.user.id,
     },
+    include: {
+      cartItems: {
+        select: {
+          product: true,
+        },
+      },
+    },
   });
+
   return NextResponse.json(cart);
 }

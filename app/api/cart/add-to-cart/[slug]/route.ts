@@ -1,6 +1,9 @@
 import { getServerAuthSession, prisma } from '@/utils/auth';
 import { NextResponse } from 'next/server';
-export default async function Post({ params }: { params: { slug: string } }) {
+export async function POST(
+  req: Request,
+  { params }: { params: { slug: string } }
+) {
   const productId = params.slug;
   const session = await getServerAuthSession();
 
@@ -20,7 +23,7 @@ export default async function Post({ params }: { params: { slug: string } }) {
         userId: session.user.id,
         cartItems: {
           some: {
-            productId: productId,
+            productId: product.id,
           },
         },
       },
@@ -32,7 +35,10 @@ export default async function Post({ params }: { params: { slug: string } }) {
       const updateCart = await prisma.cartItem.update({
         where: {
           id: cart.cartItems[0].id,
-          productId: productId,
+          productId: product.id,
+          cart: {
+            userId: session.user.id,
+          },
         },
         data: {
           quantity: {

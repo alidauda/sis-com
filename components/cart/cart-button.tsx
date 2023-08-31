@@ -6,8 +6,18 @@ import LoadingDots from '../loading';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/utils/product';
+import { useMutation } from '@tanstack/react-query';
 
 export default function CartButton({ product }: { product: Product }) {
+  const mutation = useMutation({
+    mutationFn: () => addToCart(product.id),
+    onError: (e) => {
+      console.log(e);
+    },
+    onSuccess: (data) => {
+      console.log(data);
+    },
+  });
   const router = useRouter();
   const session = useSession();
 
@@ -20,6 +30,7 @@ export default function CartButton({ product }: { product: Product }) {
         startTransition(() => {
           if (!session.data) {
           }
+          mutation.mutate();
         });
       }}
       title={'for sale'}
@@ -37,4 +48,12 @@ export default function CartButton({ product }: { product: Product }) {
       <span>{'Add To Cart'}</span>
     </button>
   );
+}
+
+async function addToCart(id: string) {
+  const add = await fetch(`/api/cart/add-to-cart/${id}`, {
+    method: 'POST',
+  });
+  const res = await add.json();
+  return res;
 }

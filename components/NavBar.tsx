@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import OpenCart from './cart/open-cart';
+import CartWrapper from './cart/CartWrapper';
 
 export default async function Navbar() {
   return (
@@ -28,12 +29,11 @@ export default async function Navbar() {
             </li>
           </ul>
         </div>
-        <div className='hidden justify-center md:flex md:w-1/3'></div>
+        <div className='hidden justify-center md:flex md:w-1/3'>
+          <OpenCart />
+        </div>
         <div className='flex justify-end md:w-1/3'>
-          wsjhsjs
-          <Suspense fallback={<OpenCart />}>
-            <Cart />
-          </Suspense>
+          <CartWrapper />
         </div>
       </div>
     </nav>

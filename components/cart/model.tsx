@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import OpenCart from './open-cart';
 import CloseCart from './close-cart';
+import { Cart } from '@/utils/cart';
 
 type MerchandiseSearchParams = {
   [key: string]: string;
@@ -16,27 +17,27 @@ type MerchandiseSearchParams = {
 
 export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
-  const quantityRef = useRef(cart?.totalQuantity);
+  const quantityRef = useRef(cart?.cartItems.length);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
     // Open cart modal when quantity changes.
-    if (cart?.totalQuantity !== quantityRef.current) {
+    if (cart?.cartItems.length !== quantityRef.current) {
       // But only if it's not already open (quantity also changes when editing items in cart).
       if (!isOpen) {
         setIsOpen(true);
       }
 
       // Always update the quantity reference
-      quantityRef.current = cart?.totalQuantity;
+      quantityRef.current = cart?.cartItems.length;
     }
-  }, [isOpen, cart?.totalQuantity, quantityRef]);
+  }, [isOpen, cart?.cartItems.length, quantityRef]);
 
   return (
     <>
       <button aria-label='Open cart' onClick={openCart}>
-        <OpenCart quantity={cart?.totalQuantity} />
+        <OpenCart quantity={cart?.cartItems.length} />
       </button>
       <Transition show={isOpen}>
         <Dialog onClose={closeCart} className='relative z-50'>
@@ -69,7 +70,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                 </button>
               </div>
 
-              {!cart || cart.lines.length === 0 ? (
+              {!cart || cart.cartItems.length === 0 ? (
                 <div className='mt-20 flex w-full flex-col items-center justify-center overflow-hidden'>
                   <ShoppingCart className='h-16' />
 
@@ -80,7 +81,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
               ) : (
                 <div className='flex h-full flex-col justify-between overflow-hidden p-1'>
                   <ul className='flex-grow overflow-auto py-4'>
-                    {cart.lines.map((item, i) => {
+                    {cart.cartItems.map((item, i) => {
                       return (
                         <li
                           key={i}
@@ -91,7 +92,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                               {/* <DeleteItemButton item={item} /> */}
                             </div>
                             <Link
-                              href={merchandiseUrl}
+                              href={item.id}
                               onClick={closeCart}
                               className='z-30 flex flex-row space-x-4'
                             >
@@ -100,34 +101,26 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                   className='h-full w-full object-cover'
                                   width={64}
                                   height={64}
-                                  alt={
-                                    item.merchandise.product.featuredImage
-                                      .altText || item.merchandise.product.title
-                                  }
-                                  src={
-                                    item.merchandise.product.featuredImage.url
-                                  }
+                                  alt={item.name}
+                                  src={item.image}
                                 />
                               </div>
 
                               <div className='flex flex-1 flex-col text-base'>
                                 <span className='leading-tight'>
-                                  {item.merchandise.product.title}
+                                  {item.name}
                                 </span>
-                                {item.merchandise.title !== DEFAULT_OPTION ? (
-                                  <p className='text-sm text-neutral-500 dark:text-neutral-400'>
-                                    {item.merchandise.title}
-                                  </p>
-                                ) : null}
+
+                                <p className='text-sm text-neutral-500 dark:text-neutral-400'>
+                                  {item.name}
+                                </p>
                               </div>
                             </Link>
                             <div className='flex h-16 flex-col justify-between'>
                               <Price
                                 className='flex justify-end space-y-2 text-right text-sm'
-                                amount={item.cost.totalAmount.amount}
-                                currencyCode={
-                                  item.cost.totalAmount.currencyCode
-                                }
+                                amount={'2000'}
+                                currencyCode={'NGN'}
                               />
                               <div className='ml-auto flex h-9 flex-row items-center rounded-full border border-neutral-200 dark:border-neutral-700'>
                                 {/* <EditItemQuantityButton item={item} type="minus" /> */}
@@ -149,8 +142,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       <p>Taxes</p>
                       <Price
                         className='text-right text-base text-black dark:text-white'
-                        amount={cart.cost.totalTaxAmount.amount}
-                        currencyCode={cart.cost.totalTaxAmount.currencyCode}
+                        amount={'400'}
+                        currencyCode={'NGN'}
                       />
                     </div>
                     <div className='mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700'>
@@ -161,17 +154,17 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       <p>Total</p>
                       <Price
                         className='text-right text-base text-black dark:text-white'
-                        amount={cart.cost.totalAmount.amount}
-                        currencyCode={cart.cost.totalAmount.currencyCode}
+                        amount={'4000'}
+                        currencyCode={'NGN'}
                       />
                     </div>
                   </div>
-                  <a
+                  {/* <a
                     href={cart.checkoutUrl}
                     className='block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100'
                   >
                     Proceed to Checkout
-                  </a>
+                  </a> */}
                 </div>
               )}
             </Dialog.Panel>
