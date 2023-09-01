@@ -4,9 +4,10 @@ import { Suspense } from 'react';
 
 import Link from 'next/link';
 import { GridTileImage } from '@/components/GridTile';
-import { prisma } from '@/utils/auth';
+
 import { Gallery } from '@/components/products/gallery';
 import { ProductDescription } from '@/components/products/productDes';
+import prisma from '@/utils/db';
 
 export async function generateMetadata({
   params,

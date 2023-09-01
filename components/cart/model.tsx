@@ -70,7 +70,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                 </button>
               </div>
 
-              {!cart || cart.cartItems.length === 0 ? (
+              {!cart ? (
                 <div className='mt-20 flex w-full flex-col items-center justify-center overflow-hidden'>
                   <ShoppingCart className='h-16' />
 
@@ -92,7 +92,9 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                               {/* <DeleteItemButton item={item} /> */}
                             </div>
                             <Link
-                              href={item.id}
+                              href={
+                                'https://utfs.io/f/156e5a20-daf7-4759-bb0a-95807d25ded9_WhatsApp%20Image%202023-08-29%20at%2018.46.49.png'
+                              }
                               onClick={closeCart}
                               className='z-30 flex flex-row space-x-4'
                             >
@@ -101,18 +103,18 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                   className='h-full w-full object-cover'
                                   width={64}
                                   height={64}
-                                  alt={item.name}
-                                  src={item.image}
+                                  alt={item.product.name}
+                                  src={item.product.image}
                                 />
                               </div>
 
                               <div className='flex flex-1 flex-col text-base'>
                                 <span className='leading-tight'>
-                                  {item.name}
+                                  {item.product.name}
                                 </span>
 
                                 <p className='text-sm text-neutral-500 dark:text-neutral-400'>
-                                  {item.name}
+                                  {item.product.name}
                                 </p>
                               </div>
                             </Link>
@@ -126,7 +128,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                 {/* <EditItemQuantityButton item={item} type="minus" /> */}
                                 <p className='w-6 text-center'>
                                   <span className='w-full text-sm'>
-                                    {item.quantity}
+                                    {item.product.quantity}
                                   </span>
                                 </p>
                                 {/* <EditItemQuantityButton item={item} type="plus" /> */}

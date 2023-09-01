@@ -1,7 +1,7 @@
 import { Product } from '@/utils/product';
 import Link from 'next/link';
 import { GridTileImage } from './GridTile';
-import { prisma } from '@/utils/auth';
+import prisma from '@/utils/db';
 
 function ThreeItemGridItem({
   item,

@@ -1,8 +1,9 @@
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { DefaultSession, NextAuthOptions, getServerSession } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { PrismaClient } from '@prisma/client';
+
 import type { Adapter } from 'next-auth/adapters';
+import prisma from './db';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
@@ -11,7 +12,7 @@ declare module 'next-auth' {
     };
   }
 }
-export const prisma = new PrismaClient();
+
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [

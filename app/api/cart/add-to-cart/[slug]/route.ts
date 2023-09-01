@@ -1,4 +1,5 @@
-import { getServerAuthSession, prisma } from '@/utils/auth';
+import { getServerAuthSession } from '@/utils/auth';
+import prisma from '@/utils/db';
 import { NextResponse } from 'next/server';
 export async function POST(
   req: Request,
