@@ -1,9 +1,12 @@
 import { Product } from './product';
 
 export type Cart = {
-  cartItems: [
+  items: [
     {
       product: Product;
+      quantity: number;
     }
   ];
+  quantity: number;
+  total: number;
 };

@@ -23,7 +23,7 @@ export default function AddProduct() {
       <div className='relative overflow-x-auto  sm:rounded-lg'>
         <ProductTable props={data!} />
       </div>
-      {/* <UploadDropzone
+      <UploadDropzone
         endpoint='imageUploader'
         onClientUploadComplete={async (file) => {
           if (!file) return;
@@ -41,7 +41,7 @@ export default function AddProduct() {
             }),
           });
         }}
-      /> */}
+      />
     </main>
   );
 }

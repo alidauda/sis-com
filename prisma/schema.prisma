@@ -47,15 +47,15 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?    @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  roles         RoleTypes @default(USER)
-  cart          Cart?
+  roles         RoleTypes  @default(USER)
+  cart          CartItem[]
   orders        Order?
 }
 
@@ -80,34 +80,23 @@ model Product {
   cart        CartItem[]
 }
 
-model Cart {
-  id String @id @default(cuid())
-
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String     @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  cartItems CartItem[]
-
-  @@index([userId])
-}
-
 model CartItem {
   id String @id @default(cuid())
 
   quantity  Int
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  cartId    String
-  order     Order?   @relation(fields: [orderId], references: [id])
-  orderId   String?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
 
-  @@index([cartId])
-  @@index([orderId])
   @@index([productId])
+  @@index([userId])
+  @@index([orderId])
 }
 
 model Order {
@@ -116,7 +105,7 @@ model Order {
   userId    String     @unique
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  CartItems CartItem[]
+  items     CartItem[]
 
   @@index([userId])
 }

@@ -15,6 +15,6 @@ async function getCartItems(): Promise<Cart> {
     method: 'GET',
   });
   const res = await items.json();
-
+  console.log(res);
   return res;
 }

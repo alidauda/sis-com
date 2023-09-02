@@ -5,21 +5,20 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   const session = await getServerAuthSession();
   if (!session) return NextResponse.json('unauthorized');
-
-  const cart = await prisma.cart.findUnique({
+  let quantity = 0;
+  let total = 0;
+  const items = await prisma.cartItem.findMany({
     where: {
       userId: session.user.id,
-    },
-  });
-  if (!cart) return NextResponse.json('no item found');
-  const cartItems = await prisma.cartItem.findMany({
-    where: {
-      cartId: cart.id,
     },
     include: {
       product: true,
     },
   });
-
-  return NextResponse.json({ cartItems });
+  for (let i of items) {
+    const sum = i.product.price * i.quantity;
+    quantity += i.quantity;
+    total += sum;
+  }
+  return NextResponse.json({ items, quantity, total });
 }

@@ -15,31 +15,20 @@ export async function POST(
         id: productId,
       },
     });
+
     if (!product)
       return NextResponse.json('product not found', {
         status: 404,
       });
-    const cart = await prisma.cart.findUnique({
+    const cartItem = await prisma.cartItem.findFirst({
       where: {
-        userId: session.user.id,
-        cartItems: {
-          some: {
-            productId: product.id,
-          },
-        },
-      },
-      include: {
-        cartItems: true,
+        productId: productId,
       },
     });
-    if (cart) {
-      const updateCart = await prisma.cartItem.update({
+    if (cartItem) {
+      const updateCartItem = await prisma.cartItem.update({
         where: {
-          id: cart.cartItems[0].id,
-          productId: product.id,
-          cart: {
-            userId: session.user.id,
-          },
+          id: cartItem.id,
         },
         data: {
           quantity: {
@@ -47,22 +36,30 @@ export async function POST(
           },
         },
       });
-      return NextResponse.json(updateCart);
+      return NextResponse.json(updateCartItem);
     }
-    const newCartItem = await prisma.cart.create({
+    const newCartItem = await prisma.cartItem.create({
       data: {
-        userId: session.user.id,
-        cartItems: {
-          create: {
-            productId: productId,
-            quantity: 1,
+        user: {
+          connect: {
+            id: session.user.id,
+          },
+        },
+        quantity: 1,
+        product: {
+          connect: {
+            id: productId,
           },
         },
       },
+      include: {
+        product: true,
+      },
     });
+
     return NextResponse.json(newCartItem);
-  } catch {
-    return NextResponse.json('error', {
+  } catch (e) {
+    return NextResponse.json(e, {
       status: 500,
     });
   }

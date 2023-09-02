@@ -17,27 +17,27 @@ type MerchandiseSearchParams = {
 
 export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
-  const quantityRef = useRef(cart?.cartItems.length);
+  const quantityRef = useRef(cart?.quantity);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
     // Open cart modal when quantity changes.
-    if (cart?.cartItems.length !== quantityRef.current) {
+    if (cart?.quantity !== quantityRef.current) {
       // But only if it's not already open (quantity also changes when editing items in cart).
       if (!isOpen) {
         setIsOpen(true);
       }
 
       // Always update the quantity reference
-      quantityRef.current = cart?.cartItems.length;
+      quantityRef.current = cart?.quantity;
     }
-  }, [isOpen, cart?.cartItems.length, quantityRef]);
+  }, [isOpen, cart?.quantity, quantityRef]);
 
   return (
     <>
       <button aria-label='Open cart' onClick={openCart}>
-        <OpenCart quantity={cart?.cartItems.length} />
+        <OpenCart quantity={cart?.quantity} />
       </button>
       <Transition show={isOpen}>
         <Dialog onClose={closeCart} className='relative z-50'>
@@ -81,7 +81,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
               ) : (
                 <div className='flex h-full flex-col justify-between overflow-hidden p-1'>
                   <ul className='flex-grow overflow-auto py-4'>
-                    {cart.cartItems.map((item, i) => {
+                    {cart.items.map((item, i) => {
                       return (
                         <li
                           key={i}
@@ -128,7 +128,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                 {/* <EditItemQuantityButton item={item} type="minus" /> */}
                                 <p className='w-6 text-center'>
                                   <span className='w-full text-sm'>
-                                    {item.product.quantity}
+                                    {item.quantity}
                                   </span>
                                 </p>
                                 {/* <EditItemQuantityButton item={item} type="plus" /> */}
@@ -156,17 +156,17 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       <p>Total</p>
                       <Price
                         className='text-right text-base text-black dark:text-white'
-                        amount={'4000'}
+                        amount={cart.total.toString()}
                         currencyCode={'NGN'}
                       />
                     </div>
                   </div>
-                  {/* <a
-                    href={cart.checkoutUrl}
+                  <a
+                    href={'/check-out'}
                     className='block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100'
                   >
                     Proceed to Checkout
-                  </a> */}
+                  </a>
                 </div>
               )}
             </Dialog.Panel>
