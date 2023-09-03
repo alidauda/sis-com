@@ -29,7 +29,7 @@ const AddAddress: React.FC = () => {
 
   return (
     <>
-      <div className='grid grid-cols-1 gap-y-2 bg-white'>
+      <div className='grid grid-cols-1 gap-y-2 bg-white p-6 '>
         <div className='grid grid-cols-2 gap-x-2'>
           <Input
             label='first name'
