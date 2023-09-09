@@ -1,10 +1,9 @@
 'use client';
-import { UploadDropzone } from '@/utils/uploadthing';
-import '@uploadthing/react/styles.css';
 
 import { useQuery } from '@tanstack/react-query';
 import { getProduct } from '@/utils/product';
 import ProductTable from '@/components/Product';
+import AddProductModal from '@/components/AddproudctModal';
 
 export default function AddProduct() {
   const { data, isLoading } = useQuery({
@@ -20,28 +19,10 @@ export default function AddProduct() {
   console.log(data);
   return (
     <main>
+      <AddProductModal />
       <div className='relative overflow-x-auto  sm:rounded-lg'>
         <ProductTable props={data!} />
       </div>
-      <UploadDropzone
-        endpoint='imageUploader'
-        onClientUploadComplete={async (file) => {
-          if (!file) return;
-          const product = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              name: 'test',
-              price: 200,
-              image: file[0].url,
-              quantity: 1,
-              description: 'test',
-            }),
-          });
-        }}
-      />
     </main>
   );
 }
