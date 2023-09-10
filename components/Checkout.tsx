@@ -13,7 +13,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMutation } from '@tanstack/react-query';
 
-export default function CardWithForm() {
+export default function CardWithForm({
+  amount,
+}: {
+  amount: string | undefined;
+}) {
   const mutation = useMutation({
     mutationFn: checkOut,
   });
@@ -62,7 +66,7 @@ export default function CardWithForm() {
               mutation.mutate();
             }}
           >
-            {mutation.isLoading ? '.....' : 'Checkout'}
+            {mutation.isLoading ? '.....' : `${amount}`}
           </Button>
         </CardFooter>
       </Card>

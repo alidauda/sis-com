@@ -14,6 +14,7 @@ import { UploadDropzone } from '@/utils/uploadthing';
 import '@uploadthing/react/styles.css';
 import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { utapi } from 'uploadthing/server';
 
 type Inputs = {
   name: string;
@@ -39,7 +40,12 @@ export default function AddProductModal() {
     <Dialog>
       <DialogTrigger asChild>
         <div className='flex justify-end m-2'>
-          <Button variant='outline' onClick={(_) => setImageUrl('')}>
+          <Button
+            variant='outline'
+            onClick={(_) => {
+              setImageUrl('');
+            }}
+          >
             Add Product
           </Button>
         </div>

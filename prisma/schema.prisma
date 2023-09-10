@@ -68,16 +68,17 @@ model VerificationToken {
 }
 
 model Product {
-  id          String     @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   price       Int
   description String
   image       String
   userId      String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   quantity    Int
   cart        CartItem[]
+  OrderItems  OrderItems[]
 }
 
 model CartItem {
@@ -91,26 +92,36 @@ model CartItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Order     Order?   @relation(fields: [orderId], references: [id])
-  orderId   String?
 
   @@index([productId])
   @@index([userId])
-  @@index([orderId])
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String      @unique
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  items         CartItem[]
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   totalAmount   Int
   totalQuantity Int
-  status        OrderStatus @default(PENDING)
+  status        OrderStatus  @default(PENDING)
+  OrderItems    OrderItems[]
 
   @@index([userId])
+}
+
+model OrderItems {
+  id        String  @id @default(cuid())
+  quantity  Int
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([orderId])
 }
 
 enum OrderStatus {

@@ -1,20 +1,8 @@
-import { Cart } from '@/utils/cart';
-import { useQuery } from '@tanstack/react-query';
+import { use } from 'react';
 import CartModal from './model';
+import useCartItem from '@/utils/checkOutHelper';
 
 export default function CartItem() {
-  const { data, isLoading } = useQuery(['cartItem'], {
-    queryFn: getCartItems,
-  });
-
+  const { data } = useCartItem();
   return <CartModal cart={data} />;
-}
-
-async function getCartItems(): Promise<Cart> {
-  const items = await fetch('/api/cart', {
-    method: 'GET',
-  });
-  const res = await items.json();
-  console.log(res);
-  return res;
 }

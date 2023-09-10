@@ -10,6 +10,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import OpenCart from './open-cart';
 import CloseCart from './close-cart';
 import { Cart } from '@/utils/cart';
+import { useMutation } from '@tanstack/react-query';
 
 type MerchandiseSearchParams = {
   [key: string]: string;
@@ -20,6 +21,24 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const quantityRef = useRef(cart?.quantity);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
+  const { mutate, isLoading } = useMutation({
+    mutationKey: ['add-to-cart'],
+    mutationFn: async () => {
+      const order = await fetch('/api/orders', {
+        method: 'POST',
+        body: JSON.stringify({
+          items: cart?.items,
+          totalAmount: cart?.total,
+          totalQuantity: cart?.quantity,
+        }),
+      });
+      const data = await order.json();
+      return data;
+    },
+    onSuccess: (data) => {
+      console.log(data);
+    },
+  });
 
   useEffect(() => {
     // Open cart modal when quantity changes.
@@ -161,12 +180,12 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       />
                     </div>
                   </div>
-                  <a
-                    href={'/check-out'}
+                  <button
                     className='block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100'
+                    onClick={() => mutate()}
                   >
-                    Proceed to Checkout
-                  </a>
+                    {isLoading ? '...loading' : 'Proceed to Checkout'}
+                  </button>
                 </div>
               )}
             </Dialog.Panel>
