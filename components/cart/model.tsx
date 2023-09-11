@@ -23,18 +23,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const closeCart = () => setIsOpen(false);
   const { mutate, isLoading } = useMutation({
     mutationKey: ['add-to-cart'],
-    mutationFn: async () => {
-      const order = await fetch('/api/orders', {
-        method: 'POST',
-        body: JSON.stringify({
-          items: cart?.items,
-          totalAmount: cart?.total,
-          totalQuantity: cart?.quantity,
-        }),
-      });
-      const data = await order.json();
-      return data;
-    },
+    mutationFn: async () => {},
     onSuccess: (data) => {
       console.log(data);
     },

@@ -36,3 +36,23 @@ export async function POST(req: Request) {
   });
   return NextResponse.json({ orders }, { status: 200 });
 }
+
+export async function GET() {
+  const session = await getServerAuthSession();
+  if (!session)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { id } = session.user;
+  const orders = await prisma.order.findUnique({
+    where: {
+      userId: id,
+    },
+    include: {
+      OrderItems: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+  return NextResponse.json({ orders }, { status: 200 });
+}

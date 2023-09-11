@@ -14,20 +14,47 @@ import { Label } from '@/components/ui/label';
 import { useMutation } from '@tanstack/react-query';
 
 export default function CardWithForm({
-  amount,
+  cartItems,
 }: {
-  amount: string | undefined;
+  cartItems:
+    | {
+        items: {
+          quantity: number;
+          product: {
+            id: string;
+            quantity: number;
+            name: string;
+            price: number;
+            description: string;
+            image: string;
+          };
+        }[];
+        total: number;
+        quantity: number;
+      }
+    | undefined;
 }) {
   const mutation = useMutation({
-    mutationFn: checkOut,
+    mutationFn: async () => {
+      const order = await fetch('/api/orders', {
+        method: 'POST',
+        body: JSON.stringify({
+          items: cartItems?.items,
+          totalAmount: cartItems?.total,
+          totalQuantity: cartItems?.quantity,
+        }),
+      });
+      const data = await order.json();
+      return data;
+    },
   });
   return (
     <div className='flex justify-center'>
       <Card className='w-[500px] '>
         <CardHeader>
-          <CardTitle>Create project</CardTitle>
-          <CardDescription>
-            Deploy your new project in one-click.
+          <CardTitle className='text-center'>Details</CardTitle>
+          <CardDescription className='text-center'>
+            please fill in the delivery details
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -35,13 +62,13 @@ export default function CardWithForm({
             <div className='grid w-full items-center gap-4 p-3'>
               <div className='flex flex-col space-y-1.5'>
                 <Label htmlFor='name'>Name</Label>
-                <Input id='name' placeholder='Name of your project' />
+                <Input id='name' placeholder='name' />
               </div>
             </div>
             <div className='grid w-full items-center gap-4 p-3'>
               <div className='flex flex-col space-y-1.5'>
-                <Label htmlFor='name'>Name</Label>
-                <Input id='name' placeholder='Name of your project' />
+                <Label htmlFor='Address'>Address</Label>
+                <Input id='Address' placeholder='Address' />
               </div>
             </div>
             <div className='grid w-full items-center gap-4 p-3'>
@@ -52,8 +79,8 @@ export default function CardWithForm({
             </div>
             <div className='grid w-full items-center gap-4 p-3'>
               <div className='flex flex-col space-y-1.5'>
-                <Label htmlFor='name'>Name</Label>
-                <Input id='name' placeholder='Name of your project' />
+                <Label htmlFor='name'>State</Label>
+                <Input id='State' placeholder='State' />
               </div>
             </div>
           </form>
@@ -66,7 +93,7 @@ export default function CardWithForm({
               mutation.mutate();
             }}
           >
-            {mutation.isLoading ? '.....' : `${amount}`}
+            {mutation.isLoading ? '.....' : `${cartItems?.total}`}
           </Button>
         </CardFooter>
       </Card>

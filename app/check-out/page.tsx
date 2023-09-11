@@ -13,5 +13,5 @@ export default async function CheckOut() {
   const cartItems = await getCarItems(session.user.id);
   console.log(cartItems);
 
-  return <CheckOutParent cart={cartItems} />;
+  return <CheckOutParent cartItems={cartItems} />;
 }
