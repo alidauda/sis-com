@@ -39,8 +39,8 @@ export default function Orders() {
         <tbody>
           {isLoading ? (
             <SkeletonDemo />
-          ) : data ? (
-            data.orders.OrderItems.map((item) => (
+          ) : !data?.orders?.OrderItems?.length ? (
+            data?.orders?.OrderItems?.map((item) => (
               <TableRow key={item.productId} order={item} />
             ))
           ) : (

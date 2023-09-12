@@ -27,7 +27,7 @@ export async function getCarItems(id: string) {
     quantity += i.quantity;
     total += sum;
   }
-  
+
   return {
     items,
     total,
