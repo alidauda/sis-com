@@ -7,11 +7,11 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json('Unauthorized');
 
   const body = (await req.json()) as {
-    name: 'string';
-    price: number;
-    description: 'string';
-    image: 'string';
-    quantity: number;
+    name: string;
+    price: string;
+    description: string;
+    image: string;
+    quantity: string;
   };
 
   const product = await prisma.product.create({

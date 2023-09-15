@@ -1,10 +1,10 @@
 export type Product = {
   id: string;
   name: string;
-  price: number;
+  price: string;
   image: string;
   description: string;
-  quantity: number;
+  quantity: string;
 };
 
 export const getProduct = async (): Promise<Product[]> => {

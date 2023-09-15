@@ -1,3 +1,4 @@
+'use client';
 import {
   Dialog,
   DialogContent,
@@ -8,13 +9,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import { Button } from '@/components/ui/button';
 import { UploadDropzone } from '@/utils/uploadthing';
 import '@uploadthing/react/styles.css';
 import { useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+
 import { utapi } from 'uploadthing/server';
+import { QueryClient, useMutation } from '@tanstack/react-query';
 
 type Inputs = {
   name: string;
@@ -23,19 +25,42 @@ type Inputs = {
 
   quantity: string;
 };
-
+const queryClient = new QueryClient();
 export default function AddProductModal() {
-  const {
-    register,
-    handleSubmit,
-
-    formState: { errors },
-  } = useForm<Inputs>();
   const [imageUrl, setImageUrl] = useState('');
-  const submit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
-  };
+  const [productName, setProductName] = useState('');
+  const [price, setPrice] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [description, setDescription] = useState('');
+  const { mutate, isLoading } = useMutation({
+    mutationFn: async () => {
+      if (
+        productName.trim().length === 0 &&
+        description.trim().length === 0 &&
+        price.trim().length === 0 &&
+        quantity.trim().length === 0
+      ) {
+        return;
+      }
+      const data = await fetch('/api/products', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: productName,
+          price: price,
+          description: description,
+          image: imageUrl,
+          quantity: quantity,
+        }),
+      });
+      const product = await data.json();
+      return product;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listofproducts'] });
+    },
+  });
 
+  const addProduct = () => {};
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -62,7 +87,7 @@ export default function AddProductModal() {
             id='name'
             placeholder='product name'
             className='col-span-3'
-            {...(register('name'), { required: true, minLength: 2 })}
+            onChange={(e) => setProductName(e.target.value)}
           />
 
           <Input
@@ -70,19 +95,19 @@ export default function AddProductModal() {
             type='text'
             placeholder='dscription'
             className='col-span-3'
-            {...register('description')}
+            onChange={(e) => setDescription(e.target.value)}
           />
           <Input
             id='quantity'
             placeholder='quantity'
             className='col-span-3'
-            {...(register('quantity'), { required: true })}
+            onChange={(e) => setQuantity(e.target.value)}
           />
           <Input
             id='price'
             placeholder='price'
             className='col-span-3'
-            {...(register('price'), { required: true })}
+            onChange={(e) => setPrice(e.target.value)}
           />
 
           <UploadDropzone
@@ -95,8 +120,8 @@ export default function AddProductModal() {
           />
         </div>
         <DialogFooter>
-          <Button type='submit' onSubmit={handleSubmit(submit)}>
-            Save changes
+          <Button type='button' onClick={() => mutate()}>
+            {isLoading ? 'loading' : 'add product'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -70,13 +70,13 @@ model VerificationToken {
 model Product {
   id          String       @id @default(cuid())
   name        String
-  price       Int
-  description String
+  price       String
+  description String       @db.Text
   image       String
   userId      String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  quantity    Int
+  quantity    String
   cart        CartItem[]
   OrderItems  OrderItems[]
 }

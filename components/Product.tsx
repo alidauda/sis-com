@@ -2,9 +2,9 @@ import Image from 'next/image';
 interface ProductProps {
   id: string;
   name: string;
-  price: number;
+  price: string;
   image: string;
-  quantity: number;
+  quantity: string;
   description: string;
 }
 

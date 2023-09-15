@@ -6,8 +6,8 @@ import ProductTable from '@/components/Product';
 import AddProductModal from '@/components/AddproudctModal';
 
 export default function AddProduct() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['adminProduct'],
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ['listofproducts'],
     queryFn: getProduct,
   });
   if (isLoading) {
