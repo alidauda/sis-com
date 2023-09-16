@@ -13,10 +13,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { UploadDropzone } from '@/utils/uploadthing';
 import '@uploadthing/react/styles.css';
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 import { utapi } from 'uploadthing/server';
-import { QueryClient, useMutation } from '@tanstack/react-query';
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 type Inputs = {
   name: string;
@@ -25,13 +29,14 @@ type Inputs = {
 
   quantity: string;
 };
-const queryClient = new QueryClient();
+
 export default function AddProductModal() {
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState({ url: '', key: '' });
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('');
   const [description, setDescription] = useState('');
+  const queryClient = useQueryClient();
   const { mutate, isLoading } = useMutation({
     mutationFn: async () => {
       if (
@@ -48,7 +53,8 @@ export default function AddProductModal() {
           name: productName,
           price: price,
           description: description,
-          image: imageUrl,
+          imageUrl: imageUrl.url,
+          imageKey: imageUrl.key,
           quantity: quantity,
         }),
       });
@@ -67,8 +73,8 @@ export default function AddProductModal() {
         <div className='flex justify-end m-2'>
           <Button
             variant='outline'
-            onClick={(_) => {
-              setImageUrl('');
+            onClick={async (_) => {
+              setImageUrl({ url: '', key: '' });
             }}
           >
             Add Product
@@ -115,7 +121,7 @@ export default function AddProductModal() {
             className='col-span-3'
             onClientUploadComplete={async (file) => {
               if (!file) return;
-              setImageUrl(file[0].url);
+              setImageUrl({ url: file[0].url, key: file[0].key });
             }}
           />
         </div>

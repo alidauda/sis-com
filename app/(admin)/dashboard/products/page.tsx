@@ -6,12 +6,16 @@ import ProductTable from '@/components/Product';
 import AddProductModal from '@/components/AddproudctModal';
 
 export default function AddProduct() {
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['listofproducts'],
     queryFn: getProduct,
+    refetchOnWindowFocus: false,
   });
   if (isLoading) {
     return <div>loading...</div>;
+  }
+  if (isFetching) {
+    return <div>fetching...</div>;
   }
   if (!data) {
     return <div>no data</div>;

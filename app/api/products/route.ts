@@ -10,7 +10,8 @@ export async function POST(req: Request) {
     name: string;
     price: string;
     description: string;
-    image: string;
+    imageUrl: string;
+    imageKey: string;
     quantity: string;
   };
 
@@ -19,9 +20,10 @@ export async function POST(req: Request) {
       userId: session.user.id,
       name: body.name,
       price: body.price,
-      image: body.image,
+      imageUrl: body.imageUrl,
+      imageKey: body.imageKey,
       description: body.description,
-      quantity: body.quantity,
+      quantity: parseInt(body.quantity),
     },
   });
 
@@ -35,8 +37,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: NextRequest) {
   const session = await getServerAuthSession();
-  if (!session) throw new Error('Unauthorized');
-
+  if (!session) return NextResponse.json('Unauthorized');
   const products = await prisma.product.findMany({
     where: {
       userId: session.user.id,
@@ -48,5 +49,52 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     console.error(e);
     return NextResponse.json('something went wrong');
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const session = await getServerAuthSession();
+  if (!session) throw new Error('Unauthorized');
+
+  const body = (await req.json()) as {
+    action: string;
+    id: string;
+  };
+  if (!body) {
+    return NextResponse.json({ message: 'No body', data: [] });
+  }
+  const product = await prisma.product.findUnique({
+    where: {
+      id: body.id,
+    },
+  });
+  if (!product) {
+    return NextResponse.json({ message: 'No product', data: [] });
+  }
+  if (body.action === 'increment') {
+    const data = await prisma.product.update({
+      where: {
+        id: body.id,
+      },
+      data: {
+        quantity: {
+          increment: 1,
+        },
+      },
+    });
+    return NextResponse.json({ message: 'Incremented', data });
+  }
+  if (body.action === 'decrement') {
+    const data = await prisma.product.update({
+      where: {
+        id: body.id,
+      },
+      data: {
+        quantity: {
+          decrement: 1,
+        },
+      },
+    });
+    return NextResponse.json({ message: 'Decremented', data });
   }
 }

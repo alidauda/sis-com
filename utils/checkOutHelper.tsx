@@ -4,7 +4,6 @@ import { Cart } from './cart';
 export default function useCartItem() {
   const { data, isLoading } = useQuery(['cartItem'], {
     queryFn: getCartItems,
-    refetchOnWindowFocus: false,
   });
   return { data, isLoading };
 }

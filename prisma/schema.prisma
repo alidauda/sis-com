@@ -72,11 +72,12 @@ model Product {
   name        String
   price       String
   description String       @db.Text
-  image       String
+  imageUrl    String
+  imageKey    String
   userId      String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  quantity    String
+  quantity    Int
   cart        CartItem[]
   OrderItems  OrderItems[]
 }
