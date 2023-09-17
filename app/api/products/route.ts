@@ -1,37 +1,57 @@
 import { getServerAuthSession } from '@/utils/auth';
 import prisma from '@/utils/db';
-
+import * as z from 'zod';
 import { NextResponse, NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
+
+const bodySchema = z.object({
+  name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
+  price: z.string().min(1, { message: 'Price must be at least 1 characters' }),
+  description: z
+    .string()
+    .min(3, { message: 'Description must be at least 3 characters' }),
+  imageUrl: z
+    .string()
+    .min(3, { message: 'ImageUrl must be at least 3 characters' }),
+  imageKey: z
+    .string()
+    .min(3, { message: 'ImageKey must be at least 3 characters' }),
+  quantity: z
+    .string()
+    .min(1, { message: 'Quantity must be at least 1 characters' }),
+});
+
 export async function POST(req: Request) {
   const session = await getServerAuthSession();
   if (!session) return NextResponse.json('Unauthorized');
-
-  const body = (await req.json()) as {
-    name: string;
-    price: string;
-    description: string;
-    imageUrl: string;
-    imageKey: string;
-    quantity: string;
-  };
-
-  const product = await prisma.product.create({
-    data: {
-      userId: session.user.id,
-      name: body.name,
-      price: body.price,
-      imageUrl: body.imageUrl,
-      imageKey: body.imageKey,
-      description: body.description,
-      quantity: parseInt(body.quantity),
-    },
-  });
-
+  const body = await req.json();
   try {
-    return NextResponse.json({ product });
+    const value = bodySchema.parse(body);
+
+    const product = await prisma.product.create({
+      data: {
+        userId: session.user.id,
+        name: value.name,
+        price: value.price,
+        imageUrl: value.imageUrl,
+        imageKey: value.imageKey,
+        description: value.description,
+        quantity: parseInt(value.quantity),
+      },
+    });
+
+    return NextResponse.json({ error: null, product });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json('something went wrong');
+    if (e instanceof z.ZodError) {
+      const error = e.format();
+      return NextResponse.json({ error });
+    }
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === 'P2002') {
+        return NextResponse.json({ error: 'Product already exists' });
+      }
+    }
+    return NextResponse.json({ error: 'something went wrong' });
   }
 }
 
