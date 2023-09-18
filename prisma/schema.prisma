@@ -72,14 +72,14 @@ model Product {
   name        String
   price       String
   description String       @db.Text
-  imageUrl    String
-  imageKey    String
+  inStock     Boolean      @default(true)
   userId      String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   quantity    Int
   cart        CartItem[]
   OrderItems  OrderItems[]
+  Images      Images[]
 }
 
 model CartItem {
@@ -126,6 +126,16 @@ model OrderItems {
 
   @@index([productId])
   @@index([orderId])
+}
+
+model Images {
+  id        String  @id @default(cuid())
+  imageUrl  String
+  imageKey  String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
 }
 
 enum OrderStatus {

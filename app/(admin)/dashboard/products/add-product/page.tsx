@@ -56,6 +56,7 @@ export default function AddProduct() {
         files: image?.File,
         endpoint: 'imageUploader',
       });
+      console.log(file);
       if (!file) return;
       const newProduct = await fetch('/api/products', {
         method: 'POST',
@@ -63,8 +64,12 @@ export default function AddProduct() {
           name: data.name,
           price: data.price,
           description: data.description,
-          imageUrl: file[0].url,
-          imageKey: file[0].key,
+          imageInfo: file.map((img) => {
+            return {
+              imageUrl: img.url,
+              imageKey: img.key,
+            };
+          }),
           quantity: data.quantity,
         }),
       });

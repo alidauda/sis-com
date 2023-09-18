@@ -10,15 +10,16 @@ const bodySchema = z.object({
   description: z
     .string()
     .min(3, { message: 'Description must be at least 3 characters' }),
-  imageUrl: z
-    .string()
-    .min(3, { message: 'ImageUrl must be at least 3 characters' }),
-  imageKey: z
-    .string()
-    .min(3, { message: 'ImageKey must be at least 3 characters' }),
+
   quantity: z
     .string()
     .min(1, { message: 'Quantity must be at least 1 characters' }),
+  imageInfo: z.array(
+    z.object({
+      imageUrl: z.string(),
+      imageKey: z.string(),
+    })
+  ),
 });
 
 export async function POST(req: Request) {
@@ -33,10 +34,15 @@ export async function POST(req: Request) {
         userId: session.user.id,
         name: value.name,
         price: value.price,
-        imageUrl: value.imageUrl,
-        imageKey: value.imageKey,
+
         description: value.description,
         quantity: parseInt(value.quantity),
+        Images: {
+          create: value.imageInfo.map((image) => ({
+            imageUrl: image.imageUrl,
+            imageKey: image.imageKey,
+          })),
+        },
       },
     });
 
