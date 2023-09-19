@@ -31,9 +31,9 @@ export default async function Navbar() {
         </div>
         <div className='hidden justify-center md:flex md:w-1/3'></div>
         <div className='flex justify-end md:w-1/3'>
-          <Suspense fallback={<OpenCart />}>
+          {/* <Suspense fallback={<OpenCart />}>
             <CartWrapper />
-          </Suspense>
+          </Suspense> */}
         </div>
       </div>
     </nav>

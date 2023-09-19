@@ -12,7 +12,6 @@ function ThreeItemGridItem({
   size: 'full' | 'half';
   priority?: boolean;
 }) {
-  console.log(item);
   return (
     <div
       className={
@@ -26,7 +25,7 @@ function ThreeItemGridItem({
         href={`product/${item.id}`}
       >
         <GridTileImage
-          src={item.image}
+          src={item.Images[0].imageUrl}
           fill
           sizes={
             size === 'full'
@@ -50,20 +49,36 @@ function ThreeItemGridItem({
 export async function ThreeItemGrid() {
   // Collections that start with `hidden-*` are hidden from the search page.
   const items = await getProduct();
+
   if (!items?.length) return;
+  const newList = items.map((item) => {
+    return {
+      ...item,
+      quantity: item.quantity.toString(),
+    };
+  });
   return (
     <section className='mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2'>
-      <ThreeItemGridItem size='full' item={items[0]} priority={true} />
-      <ThreeItemGridItem size='half' item={items[1]} priority={true} />
-      <ThreeItemGridItem size='half' item={items[1]} />
+      {newList.map((items, i) => (
+        <ThreeItemGridItem
+          size='half'
+          item={items}
+          priority={true}
+          key={items.id}
+        />
+      ))}
     </section>
   );
 }
 
 async function getProduct() {
   try {
-    const product = await prisma.product.findMany({});
-    console.log(product);
+    const product = await prisma.product.findMany({
+      include: {
+        Images: true,
+      },
+    });
+
     return product;
   } catch (err) {
     return;

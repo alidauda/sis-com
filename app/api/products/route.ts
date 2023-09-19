@@ -56,6 +56,9 @@ export async function POST(req: Request) {
       if (e.code === 'P2002') {
         return NextResponse.json({ error: 'Product already exists' });
       }
+      if (e.code === 'p1001') {
+        return NextResponse.json({ error: 'Something went wrong' });
+      }
     }
     return NextResponse.json({ error: 'something went wrong' });
   }
@@ -67,6 +70,9 @@ export async function GET(req: NextRequest) {
   const products = await prisma.product.findMany({
     where: {
       userId: session.user.id,
+    },
+    include: {
+      Images: true,
     },
   });
 

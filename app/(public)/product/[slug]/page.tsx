@@ -22,11 +22,11 @@ export async function generateMetadata({
     title: product.name,
     description: product.description,
 
-    openGraph: product.image
+    openGraph: product.Images[0].imageUrl
       ? {
           images: [
             {
-              url: product.image,
+              url: product.Images[0].imageUrl,
               width: 100,
               height: 100,
               alt: product.name,
@@ -51,7 +51,7 @@ export default async function ProductPage({
     '@type': 'Product',
     name: product.name,
     description: product.description,
-    image: product.image,
+    image: product.Images[0].imageUrl,
     offers: {
       '@type': 'AggregateOffer',
       availability: true
@@ -89,6 +89,9 @@ async function getProduct(id: string) {
   const product = await prisma.product.findFirst({
     where: {
       id: id,
+    },
+    include: {
+      Images: true,
     },
   });
   return product;

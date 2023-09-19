@@ -2,7 +2,11 @@ export type Product = {
   id: string;
   name: string;
   price: string;
-  imageUrl: string;
+  inStock: boolean;
+  Images: {
+    imageUrl: string;
+  }[];
+
   description: string;
   quantity: string;
 };

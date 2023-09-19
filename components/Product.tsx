@@ -1,157 +1,127 @@
-import { Product } from '@prisma/client';
 import {
-  QueryClient,
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
+  ColumnDef,
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import Image from 'next/image';
-interface ProductProps {
+import MyToggle from './Switch';
+import Link from 'next/link';
+import View from './View';
+type ProductProps = {
   id: string;
   name: string;
   price: string;
-  imageUrl: string;
-
+  inStock: boolean;
+  Images: {
+    imageUrl: string;
+  }[];
   quantity: string;
   description: string;
-}
+};
+const columnHelper = createColumnHelper<ProductProps>();
+const columns = [
+  columnHelper.accessor(
+    (row) => (
+      <div className='flex items-center px-1 py-2 text-gray-900 whitespace-nowrap dark:text-white'>
+        <Image
+          height={60}
+          width={60}
+          src={row.Images[0].imageUrl}
+          alt='Jese image'
+        />
+        <div className='pl-3'>
+          <Link href='#'>
+            <div className='text-base font-semibold text-blue-300'>
+              {row.name}
+            </div>
+          </Link>
+        </div>
+      </div>
+    ),
 
+    {
+      id: 'name',
+      header: 'Product',
+      cell: (value) => value.getValue(),
+    }
+  ),
+  columnHelper.accessor('price', {
+    cell: (value) => (
+      <div className='text-base font-semibold'>
+        {Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency: 'NGN',
+          currencyDisplay: 'narrowSymbol',
+        }).format(parseInt(value.getValue()))}
+      </div>
+    ),
+  }),
+  columnHelper.accessor(
+    (row) => (
+      <div className='flex gap-3'>
+        <MyToggle status={row.inStock} />
+        <div className='text-base font-semibold text-green-400'>
+          {'in stock: ' +
+            Intl.NumberFormat(undefined, {
+              style: 'currency',
+              currency: 'NGN',
+              currencyDisplay: 'narrowSymbol',
+            }).format(parseInt(row.price))}
+        </div>
+      </div>
+    ),
+    {
+      id: 'stock',
+      header: 'Stock',
+      cell: (info) => info.getValue(),
+    }
+  ),
+  columnHelper.accessor('quantity', {
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor(() => <div>View</div>, {
+    id: 'actions',
+    header: 'Actions',
+    cell: (info) => info.getValue(),
+  }),
+];
 export default function ProductTable({ props }: { props: ProductProps[] }) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async ({
-      values,
-    }: {
-      values: { id: string; action: string };
-    }) => {
-      const data = await fetch(`/api/products`, {
-        method: 'PUT',
-        body: JSON.stringify({ id: values.id, action: values.action }),
-      });
-      const product = await data.json();
-      return product;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listofproducts'] });
-    },
+  const table = useReactTable({
+    data: props,
+    columns,
+
+    getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
-      <thead className='text-xs text-gray-700 uppercase bg-gray-500 dark:bg-gray-700 dark:text-gray-400'>
-        <tr>
-          <th scope='col' className='px-6 py-3'>
-            <span className='sr-only'>Image</span>
-          </th>
-          <th scope='col' className='px-6 py-3'>
-            Product
-          </th>
-          <th scope='col' className='px-6 py-3'>
-            Qty
-          </th>
-          <th scope='col' className='px-6 py-3'>
-            Price
-          </th>
-          <th scope='col' className='px-6 py-3'>
-            Action
-          </th>
-        </tr>
+    <table className=' text-lg text-left m-3 dark:text-gray-400 w-full p-3'>
+      <thead className=''>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <tr key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <th key={header.id} className='p-4'>
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+              </th>
+            ))}
+          </tr>
+        ))}
       </thead>
       <tbody>
-        {props &&
-          props.map((item) => (
-            <tr
-              className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
-              key={item.id}
-            >
-              <td className='w-32 p-4'>
-                <img src={item.imageUrl} alt={item.name} />
+        {table.getRowModel().rows.map((row) => (
+          <tr key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <td key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
-              <td className='px-6 py-4 font-semibold text-gray-900 dark:text-white'>
-                {item.name}
-              </td>
-              <td className='px-6 py-4'>
-                <div className='flex items-center space-x-3'>
-                  <button
-                    className='inline-flex items-center justify-center p-1 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700'
-                    type='button'
-                    disabled={item.quantity === '0' || mutation.isLoading}
-                    onClick={() =>
-                      mutation.mutate({
-                        values: { id: item.id, action: 'decrement' },
-                      })
-                    }
-                  >
-                    <span className='sr-only'>Quantity button</span>
-                    <svg
-                      className='w-3 h-3'
-                      aria-hidden='true'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 18 2'
-                    >
-                      <path
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M1 1h16'
-                      />
-                    </svg>
-                  </button>
-                  <div>
-                    <input
-                      type='number'
-                      id='first_product'
-                      className='bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                      placeholder='1'
-                      required
-                      value={item.quantity}
-                    />
-                  </div>
-                  <button
-                    className='inline-flex items-center justify-center h-6 w-6 p-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700'
-                    type='button'
-                    disabled={mutation.isLoading}
-                    onClick={() =>
-                      mutation.mutate({
-                        values: { id: item.id, action: 'increment' },
-                      })
-                    }
-                  >
-                    <span className='sr-only'>Quantity button</span>
-                    <svg
-                      className='w-3 h-3'
-                      aria-hidden='true'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 18 18'
-                    >
-                      <path
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M9 1v16M1 9h16'
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-              <td className='px-6 py-4 font-semibold text-gray-900 dark:text-white'>
-                {item.price}
-              </td>
-              <td className='px-6 py-4'>
-                <a
-                  href='#'
-                  className='font-medium text-red-600 dark:text-red-500 hover:underline'
-                >
-                  Remove
-                </a>
-              </td>
-            </tr>
-          ))}
+            ))}
+          </tr>
+        ))}
       </tbody>
     </table>
   );

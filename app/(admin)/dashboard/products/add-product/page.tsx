@@ -12,7 +12,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
 import Dropzone from 'react-dropzone';
@@ -20,6 +20,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { uploadFiles } from '@/utils/uploadthing';
+import { useRouter } from 'next/navigation';
 const formSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
   price: z.string().min(1, { message: 'Price must be at least 1 character' }),
@@ -41,7 +42,8 @@ export default function AddProduct() {
   });
   const [image, setImage] = useState<ImageProps>();
   const [imageError, setImageError] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   async function onSubmit(data: z.infer<typeof formSchema>) {
     if (image?.url.length === 0) {
       setImageError(true);
@@ -52,6 +54,7 @@ export default function AddProduct() {
     }
 
     try {
+      setIsLoading(true);
       const file = await uploadFiles({
         files: image?.File,
         endpoint: 'imageUploader',
@@ -77,8 +80,11 @@ export default function AddProduct() {
         return;
       }
       const response = await newProduct.json();
+      setIsLoading(false);
+      router.push('/dashboard/products');
       return response;
     } catch (err) {
+      setIsLoading(false);
       console.log(err);
     }
   }
@@ -89,8 +95,13 @@ export default function AddProduct() {
         <Link href='/dashboard/products'>
           <ArrowLeft />
         </Link>
-        <Button type='button' onClick={form.handleSubmit(onSubmit)}>
-          Add Product
+        <Button
+          type='button'
+          onClick={form.handleSubmit(onSubmit)}
+          id='button'
+          disabled={isLoading}
+        >
+          {isLoading ? '..laoding' : 'Add Product'}
         </Button>
       </div>
       <div className='p-4 m-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700'>
@@ -272,8 +283,9 @@ export default function AddProduct() {
               type='button'
               onClick={form.handleSubmit(onSubmit)}
               id='button'
+              disabled={isLoading}
             >
-              Add Product
+              {isLoading ? '..laoding' : 'Add Product'}
             </Button>
           </div>
         </div>
