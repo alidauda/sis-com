@@ -1,7 +1,5 @@
 'use client';
-
 import { Dialog, Transition } from '@headlessui/react';
-
 import Price from '../Price';
 import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
@@ -9,43 +7,63 @@ import Link from 'next/link';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import OpenCart from './open-cart';
 import CloseCart from './close-cart';
-import { Cart } from '@/utils/cart';
-import { useMutation } from '@tanstack/react-query';
-
+import EditItemQuantityButton from './Edit';
+import DeleteItemButton from './Delete';
+import ReactQueryHelper from '@/utils/react-query';
 type MerchandiseSearchParams = {
   [key: string]: string;
 };
 
-export default function CartModal({ cart }: { cart: Cart | undefined }) {
+export default function CartModal({
+  items,
+  quantity,
+  total,
+}: {
+  items: {
+    id: string;
+    product: {
+      id: string;
+      name: string;
+      price: string;
+      description: string;
+      Images: {
+        imageUrl: string;
+      }[];
+    };
+    quantity: number;
+  }[];
+  total: number;
+  quantity: number;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  const quantityRef = useRef(cart?.quantity);
+  const quantityRef = useRef(quantity);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
-  const { mutate, isLoading } = useMutation({
-    mutationKey: ['add-to-cart'],
-    mutationFn: async () => {},
-    onSuccess: (data) => {
-      console.log(data);
-    },
-  });
+  // const { mutate, isLoading } = useMutation({
+  //   mutationKey: ['add-to-cart'],
+  //   mutationFn: async () => {},
+  //   onSuccess: (data) => {
+  //     console.log(data);
+  //   },
+  // });
 
   useEffect(() => {
     // Open cart modal when quantity changes.
-    if (cart?.quantity !== quantityRef.current) {
+    if (quantity !== quantityRef.current) {
       // But only if it's not already open (quantity also changes when editing items in cart).
       if (!isOpen) {
         setIsOpen(true);
       }
 
       // Always update the quantity reference
-      quantityRef.current = cart?.quantity;
+      quantityRef.current = quantity;
     }
-  }, [isOpen, cart?.quantity, quantityRef]);
+  }, [isOpen, quantity, quantityRef]);
 
   return (
     <>
       <button aria-label='Open cart' onClick={openCart}>
-        <OpenCart quantity={cart?.quantity} />
+        <OpenCart quantity={quantity} />
       </button>
       <Transition show={isOpen}>
         <Dialog onClose={closeCart} className='relative z-50'>
@@ -78,7 +96,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                 </button>
               </div>
 
-              {!cart ? (
+              {!items ? (
                 <div className='mt-20 flex w-full flex-col items-center justify-center overflow-hidden'>
                   <ShoppingCart className='h-16' />
 
@@ -89,8 +107,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
               ) : (
                 <div className='flex h-full flex-col justify-between overflow-hidden p-1'>
                   <ul className='flex-grow overflow-auto py-4'>
-                    {cart.items &&
-                      cart.items.map((item, i) => {
+                    {items &&
+                      items.map((item, i) => {
                         return (
                           <li
                             key={i}
@@ -98,12 +116,10 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                           >
                             <div className='relative flex w-full flex-row justify-between px-1 py-4'>
                               <div className='absolute z-40 -mt-2 ml-[55px]'>
-                                {/* <DeleteItemButton item={item} /> */}
+                                <DeleteItemButton />
                               </div>
                               <Link
-                                href={
-                                  'https://utfs.io/f/156e5a20-daf7-4759-bb0a-95807d25ded9_WhatsApp%20Image%202023-08-29%20at%2018.46.49.png'
-                                }
+                                href={item.product.Images[0].imageUrl}
                                 onClick={closeCart}
                                 className='z-30 flex flex-row space-x-4'
                               >
@@ -113,7 +129,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                     width={64}
                                     height={64}
                                     alt={item.product.name}
-                                    src={item.product.image}
+                                    src={item.product.Images[0].imageUrl}
                                   />
                                 </div>
 
@@ -130,17 +146,27 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                               <div className='flex h-16 flex-col justify-between'>
                                 <Price
                                   className='flex justify-end space-y-2 text-right text-sm'
-                                  amount={'2000'}
+                                  amount={item.product.price.toString()}
                                   currencyCode={'NGN'}
                                 />
                                 <div className='ml-auto flex h-9 flex-row items-center rounded-full border border-neutral-200 dark:border-neutral-700'>
-                                  {/* <EditItemQuantityButton item={item} type="minus" /> */}
+                                  <ReactQueryHelper>
+                                    <EditItemQuantityButton
+                                      type='minus'
+                                      item={item}
+                                    />
+                                  </ReactQueryHelper>
                                   <p className='w-6 text-center'>
                                     <span className='w-full text-sm'>
                                       {item.quantity}
                                     </span>
                                   </p>
-                                  {/* <EditItemQuantityButton item={item} type="plus" /> */}
+                                  <ReactQueryHelper>
+                                    <EditItemQuantityButton
+                                      type='plus'
+                                      item={item}
+                                    />
+                                  </ReactQueryHelper>
                                 </div>
                               </div>
                             </div>
@@ -165,17 +191,17 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       <p>Total</p>
                       <Price
                         className='text-right text-base text-black dark:text-white'
-                        amount={cart?.total?.toString()}
+                        amount={total?.toString()}
                         currencyCode={'NGN'}
                       />
                     </div>
                   </div>
-                  <button
+                  <Link
                     className='block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100'
-                    onClick={() => mutate()}
+                    href='#'
                   >
-                    {isLoading ? '...loading' : 'Proceed to Checkout'}
-                  </button>
+                    Checkout
+                  </Link>
                 </div>
               )}
             </Dialog.Panel>

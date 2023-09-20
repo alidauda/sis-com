@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import OpenCart from './cart/open-cart';
-import CartWrapper from './cart/CartWrapper';
+import CartItem from './cart/CartItem';
 
 export default async function Navbar() {
   return (
@@ -31,9 +31,9 @@ export default async function Navbar() {
         </div>
         <div className='hidden justify-center md:flex md:w-1/3'></div>
         <div className='flex justify-end md:w-1/3'>
-          {/* <Suspense fallback={<OpenCart />}>
-            <CartWrapper />
-          </Suspense> */}
+          <Suspense fallback={<OpenCart />}>
+            <CartItem />
+          </Suspense>
         </div>
       </div>
     </nav>

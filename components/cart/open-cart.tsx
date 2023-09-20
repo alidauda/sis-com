@@ -1,4 +1,5 @@
 import { ShoppingCart } from 'lucide-react';
+
 import clsx from 'clsx';
 
 export default function OpenCart({
@@ -17,9 +18,11 @@ export default function OpenCart({
         )}
       />
 
-      <div className='absolute right-0 top-0 -mr-2 -mt-2 h-4 w-4 rounded bg-blue-600 text-[11px] font-medium text-white'>
-        {quantity}
-      </div>
+      {quantity ? (
+        <div className='absolute right-0 top-0 -mr-2 -mt-2 h-4 w-4 rounded bg-blue-600 text-[11px] font-medium text-white'>
+          {quantity}
+        </div>
+      ) : null}
     </div>
   );
 }

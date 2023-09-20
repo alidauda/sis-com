@@ -9,21 +9,25 @@ export async function getCarItems(id: string) {
       userId: id,
     },
     select: {
+      id: true,
       product: {
         select: {
           name: true,
           price: true,
-          image: true,
+          Images: {
+            select: {
+              imageUrl: true,
+            },
+          },
           description: true,
           id: true,
-          quantity: true,
         },
       },
       quantity: true,
     },
   });
   for (let i of items) {
-    const sum = i.product.price * i.quantity;
+    const sum = parseInt(i.product.price) * i.quantity;
     quantity += i.quantity;
     total += sum;
   }

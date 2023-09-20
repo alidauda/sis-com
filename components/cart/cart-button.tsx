@@ -15,7 +15,9 @@ export default function CartButton({ product }: { product: Product }) {
       console.log(e);
     },
     onSuccess: (data) => {
-      console.log(data);
+      startTransition(() => {
+        router.refresh();
+      });
     },
   });
   const router = useRouter();
@@ -27,11 +29,10 @@ export default function CartButton({ product }: { product: Product }) {
       aria-label='Add item to cart'
       disabled={isPending}
       onClick={() => {
-        startTransition(() => {
-          if (!session.data) {
-          }
-          mutation.mutate();
-        });
+        if (!session.data) {
+          console.log('no session');
+        }
+        mutation.mutate();
       }}
       title={'for sale'}
       className={clsx(
