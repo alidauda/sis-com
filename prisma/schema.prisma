@@ -99,19 +99,24 @@ model CartItem {
 }
 
 model Order {
-  id            Int          @id @default(autoincrement())
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String       @unique
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  address       String       @db.Text
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  address       String   @db.Text
   name          String
   phoneNumber   String
   state         String
   totalAmount   Int
   totalQuantity Int
-  status        OrderStatus  @default(PENDING)
-  OrderItems    OrderItems[]
+  reference     String
+  city          String
+  country       String
+  email         String
+
+  status     OrderStatus  @default(PENDING)
+  OrderItems OrderItems[]
 
   @@index([userId])
 }

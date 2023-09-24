@@ -11,7 +11,6 @@ export default async function CheckOut() {
     redirect('/');
   }
   const cartItems = await getCarItems(session.user.id);
-  console.log(cartItems);
 
   return <CheckOutParent cartItems={cartItems} />;
 }

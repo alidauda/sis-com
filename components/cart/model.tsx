@@ -10,6 +10,7 @@ import CloseCart from './close-cart';
 import EditItemQuantityButton from './Edit';
 import DeleteItemButton from './Delete';
 import ReactQueryHelper from '@/utils/react-query';
+import { usePaystackPayment } from 'react-paystack';
 type MerchandiseSearchParams = {
   [key: string]: string;
 };
@@ -198,7 +199,8 @@ export default function CartModal({
                   </div>
                   <Link
                     className='block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100'
-                    href='#'
+                    href='/check-out'
+                    onClick={closeCart}
                   >
                     Checkout
                   </Link>

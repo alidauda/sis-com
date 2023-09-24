@@ -2,38 +2,37 @@ import { getServerAuthSession } from '@/utils/auth';
 import prisma from '@/utils/db';
 import { CartItem } from '@prisma/client';
 import { NextResponse } from 'next/server';
+import * as z from 'zod';
+const orderSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string(),
+      quantity: z.number(),
+      productId: z.string(),
+      userId: z.string(),
+    })
+  ),
+  totalAmount: z.number(),
+  totalQuantity: z.number(),
+  full_name: z.string(),
+  email: z.string().email(),
+  phoneNumber: z.string(),
+  address: z.string(),
+  city: z.string(),
+  state: z.string(),
+  country: z.string(),
+  reference: z.string(),
+  payemnt_status: z.string(),
+});
 export async function POST(req: Request) {
   const session = await getServerAuthSession();
   if (!session)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = session.user;
-  const data = (await req.json()) as {
-    items: CartItem[];
-    totalAmount: number;
-    totalQuantity: number;
-  };
+  const data = await req.json();
+  const order = orderSchema.parse(data);
 
-  const orders = await prisma.order.create({
-    data: {
-      user: {
-        connect: {
-          id,
-        },
-      },
-      totalQuantity: data.totalQuantity,
-      totalAmount: data.totalAmount,
-      OrderItems: {
-        create: data.items.map((item) => ({
-          product: {
-            connect: {
-              id: item.productId,
-            },
-          },
-          quantity: item.quantity,
-        })),
-      },
-    },
-  });
+  const [] = await prisma.$transaction([await prisma.order.create({})]);
   return NextResponse.json({ orders }, { status: 200 });
 }
 

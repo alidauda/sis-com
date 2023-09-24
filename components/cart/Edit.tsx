@@ -48,16 +48,16 @@ export default function EditItemQuantityButton({
             : mutate(false);
         });
       }}
-      disabled={(isPending && isLoading) || item.quantity === 1}
+      disabled={isPending || isLoading}
       className={clsx(
         'ease flex h-full min-w-[36px] max-w-[36px] flex-none items-center justify-center rounded-full px-2 transition-all duration-200 hover:border-neutral-800 hover:opacity-80',
         {
-          'cursor-not-allowed': isPending && isLoading,
+          'cursor-not-allowed': isPending || isLoading,
           'ml-auto': type === 'minus',
         }
       )}
     >
-      {isPending && isLoading ? (
+      {isPending || isLoading ? (
         <LoadingDots className='bg-black dark:bg-white' />
       ) : type === 'plus' ? (
         <Plus className='h-4 w-4 dark:text-neutral-500' />
