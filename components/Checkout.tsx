@@ -1,9 +1,6 @@
 import * as React from 'react';
-
 import { Button } from '@/components/ui/button';
-
 import { Input } from '@/components/ui/input';
-
 import { useSession } from 'next-auth/react';
 import { useAddOrderHook } from '@/utils/addtoCartHook';
 import {
@@ -19,14 +16,13 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ReactQueryHelper from '@/utils/react-query';
-
 import Price from './Price';
 import DeleteItemButton from './cart/Delete';
 import EditItemQuantityButton from './cart/Edit';
-import closeCart from './cart/close-cart';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePaystackHook } from '@/utils/paystackHook';
+import LoadingDots from './LoadingDot';
 const contactSchema = z.object({
   email: z.string().email(),
   firstName: z.string().min(2),
@@ -357,9 +353,13 @@ export default function CardWithForm({
           </div>
           <Button
             className='block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100 hover:bg-blue-400'
-            onClick={() => {}}
+            onClick={form.handleSubmit(onSubmit)}
           >
-            Checkout
+            {mutation.isLoading ? (
+              <LoadingDots className='mb-3 bg-white' />
+            ) : (
+              'checkout'
+            )}
           </Button>
         </div>
       </div>
@@ -367,13 +367,7 @@ export default function CardWithForm({
   );
 }
 
-// you can call this function anything
-
-// you can call this function anything
-const onClose = () => {
-  // implementation for  whatever you want to do when the Paystack dialog closed.
-  console.log('closed');
-};
+const onClose = () => {};
 
 type ReferenceType = {
   message: string;

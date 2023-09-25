@@ -1,4 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
 type Order = {
   items: {
     quantity: number;
@@ -17,7 +19,11 @@ type Order = {
   quantity: number;
 };
 export const useAddOrderHook = ({ order }: { order: Order | undefined }) => {
+  const router = useRouter();
   return useMutation({
+    onSuccess: () => {
+      router.push('/');
+    },
     mutationFn: async ({
       full_name,
       address,

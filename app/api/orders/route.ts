@@ -1,6 +1,6 @@
 import { getServerAuthSession } from '@/utils/auth';
 import prisma from '@/utils/db';
-import { CartItem } from '@prisma/client';
+import { CartItem, Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 const orderSchema = z.object({
@@ -8,8 +8,9 @@ const orderSchema = z.object({
     z.object({
       id: z.string(),
       quantity: z.number(),
-      productId: z.string(),
-      userId: z.string(),
+      product: z.object({
+        id: z.string(),
+      }),
     })
   ),
   totalAmount: z.number(),
@@ -28,12 +29,65 @@ export async function POST(req: Request) {
   const session = await getServerAuthSession();
   if (!session)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { id } = session.user;
-  const data = await req.json();
-  const order = orderSchema.parse(data);
+  try {
+    const { id } = session.user;
+    const data = await req.json();
+    const order = orderSchema.parse(data);
 
-  const [] = await prisma.$transaction([await prisma.order.create({})]);
-  return NextResponse.json({ orders }, { status: 200 });
+    const [orders, deleteMany] = await prisma.$transaction([
+      prisma.order.create({
+        data: {
+          name: order.full_name,
+          email: order.email,
+          phoneNumber: order.phoneNumber,
+          address: order.address,
+          city: order.city,
+          country: order.country,
+          state: order.state,
+          reference: order.reference,
+          totalAmount: order.totalAmount,
+          totalQuantity: order.totalQuantity,
+          user: {
+            connect: {
+              id: id,
+            },
+          },
+          OrderItems: {
+            create: order.items.map((item) => {
+              return {
+                quantity: item.quantity,
+                product: {
+                  connect: {
+                    id: item.product.id,
+                  },
+                },
+              };
+            }),
+          },
+        },
+      }),
+      prisma.cartItem.deleteMany({
+        where: {
+          userId: id,
+        },
+      }),
+    ]);
+    return NextResponse.json({ orders }, { status: 200 });
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      const error = e.format();
+      return NextResponse.json(
+        { error, errorType: 'zod Error' },
+        { status: 400 }
+      );
+    }
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === 'P2002') {
+        return NextResponse.json({ error: 'Duplicate order' }, { status: 400 });
+      }
+      return NextResponse.json({ error: e }, { status: 404 });
+    }
+  }
 }
 
 export async function GET() {

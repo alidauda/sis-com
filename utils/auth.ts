@@ -23,6 +23,7 @@ export const authOptions: NextAuthOptions = {
 
     // ...add more providers here
   ],
+
   adapter: PrismaAdapter(prisma) as Adapter,
   callbacks: {
     async session({ session, user }) {

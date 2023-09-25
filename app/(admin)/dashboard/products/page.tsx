@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getProduct } from '@/utils/product';
 import ProductTable from '@/components/Product';
-import AddProductModal from '@/components/AddproudctModal';
+
 import Link from 'next/link';
 
 export default function AddProduct() {
