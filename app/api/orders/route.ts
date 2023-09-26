@@ -95,7 +95,7 @@ export async function GET() {
   if (!session)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = session.user;
-  const orders = await prisma.order.findUnique({
+  const orders = await prisma.order.findMany({
     where: {
       userId: id,
     },

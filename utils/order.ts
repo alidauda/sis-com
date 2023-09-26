@@ -5,6 +5,7 @@ export type Orders = {
     totalAmount: number;
     totalQuantity: number;
     status: string;
+    name: string;
     OrderItems: [
       {
         id: string;
@@ -20,7 +21,7 @@ export type Orders = {
         };
       }
     ];
-  };
+  }[];
 };
 let n = ' ';
 for (let i = 0; i <= 8; i++) {
