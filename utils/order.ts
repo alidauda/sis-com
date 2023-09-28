@@ -6,6 +6,29 @@ export type Orders = {
     totalQuantity: number;
     status: string;
     name: string;
+    createdAt: string;
+  }[];
+};
+
+export type GetOneOrder = {
+  order: {
+    id: string;
+    userId: string;
+    totalAmount: number;
+    totalQuantity: number;
+    status: string;
+    name: string;
+    createdAt: string;
+    address: string;
+    city: string;
+    country: string;
+
+    email: string;
+
+    phoneNumber: string;
+    reference: string;
+    state: string;
+
     OrderItems: [
       {
         id: string;
@@ -17,20 +40,11 @@ export type Orders = {
           name: string;
           price: number;
           description: string;
-          image: string;
+          Images: {
+            imageUrl: string;
+          }[];
         };
       }
     ];
-  }[];
+  };
 };
-let n = ' ';
-for (let i = 0; i <= 8; i++) {
-  for (let j = 0; j <= 8; j++) {
-    if (j % 2 == 0) {
-      n += '#';
-    } else {
-      n += ' ';
-    }
-  }
-  console.log((n += '\n'));
-}

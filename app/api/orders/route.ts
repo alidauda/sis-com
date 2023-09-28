@@ -47,6 +47,7 @@ export async function POST(req: Request) {
           reference: order.reference,
           totalAmount: order.totalAmount,
           totalQuantity: order.totalQuantity,
+
           user: {
             connect: {
               id: id,
