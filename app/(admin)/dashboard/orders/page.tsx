@@ -120,7 +120,7 @@ export default function Orders() {
         price: item.totalAmount.toString(),
         quantity: item.totalQuantity.toString(),
         status: item.status,
-        date: item.createdAt,
+        date: item.updatedAt,
       };
     }) as Order[],
     columns,

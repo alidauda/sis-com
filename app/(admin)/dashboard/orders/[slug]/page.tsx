@@ -1,27 +1,72 @@
 'use client';
-
+import Customer from '@/components/Customer';
 import Price from '@/components/Price';
 import { Button } from '@/components/ui/button';
 import { GetOneOrder } from '@/utils/order';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import toast, { Toaster } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { use } from 'react';
 
+type orderState = 'CANCELLED' | 'REJECTED' | 'COMPLETED';
+const accpeted = 'bg-green-600 hover:bg-green-500';
+const rejected = 'bg-red-600 hover:bg-red-500';
 export default function Page({ params }: { params: { slug: string } }) {
   const { data, isLoading } = useQuery([params.slug], {
     queryFn: () => getOrder(params.slug),
   });
-  console.log(data?.order);
+  const router = useRouter();
+
+  const { mutate } = useMutation({
+    mutationFn: ({ state }: { state: orderState }) =>
+      updateOrder(params.slug, state),
+    onSuccess: () => {
+      toast.success('Order updated successfully');
+      router.push('/dashboard/orders');
+    },
+  });
   return (
     <div className='bg-white'>
       <div className=' bg-white p-5  shadow-lg flex justify-between'>
         <Link href='/dashboard/orders'>
           <ArrowLeft />
         </Link>
-        <Button type='button' id='button'>
-          {isLoading ? '..laoding' : 'Add Product'}
-        </Button>
+        {data?.order ? (
+          data?.order.status === 'COMPLETED' ||
+          data?.order.status === 'REJECTED' ? (
+            <Button
+              type='button'
+              id='button'
+              className={
+                data.order.status === 'COMPLETED' ? accpeted : rejected
+              }
+            >
+              {data?.order.status}
+            </Button>
+          ) : (
+            <div className='gap-4 flex '>
+              <Button
+                type='button'
+                id='button'
+                className='bg-red-600 hover:bg-red-500'
+                onClick={() => mutate({ state: 'CANCELLED' })}
+              >
+                Reject Order
+              </Button>
+              <Button
+                type='button'
+                id='button'
+                className='bg-green-600 hover:bg-green-500'
+                onClick={() => mutate({ state: 'COMPLETED' })}
+              >
+                Accept Order
+              </Button>
+            </div>
+          )
+        ) : null}
       </div>{' '}
       <div className='flex p-24 flex-col justify-between overflow-hidden shadow mx-10 my-4'>
         <h1 className='text-center font-medium text-xl'>Order Details</h1>
@@ -89,9 +134,34 @@ export default function Page({ params }: { params: { slug: string } }) {
           </div>
         </div>
       </div>
-      <div className='flex p-24 flex-col justify-between overflow-hidden shadow mx-10 my-4'>
+      <div className='flex p-24 flex-col  overflow-hidden shadow mx-10 my-4'>
         <h1 className='text-center font-medium text-xl'>Customer Details</h1>
+        <Customer
+          firstValue='name'
+          secondValue={data?.order.name!}
+          thirdValue='Email'
+          fourthValue={data?.order.email!}
+        />
+        <Customer
+          firstValue='Phone'
+          secondValue={data?.order.phoneNumber!}
+          thirdValue='Delivery Address'
+          fourthValue={data?.order.address!}
+        />
+        <Customer
+          firstValue='City'
+          secondValue={data?.order.city!}
+          thirdValue='State'
+          fourthValue={data?.order.state!}
+        />
+        <Customer
+          firstValue='Country'
+          secondValue={data?.order.country!}
+          thirdValue='Status'
+          fourthValue={data?.order.status!}
+        />
       </div>
+      <Toaster />
     </div>
   );
 }
@@ -102,6 +172,21 @@ async function getOrder(params: string): Promise<GetOneOrder> {
     headers: {
       'Content-Type': 'application/json',
     },
+  });
+  const data = await res.json();
+  return data;
+}
+
+async function updateOrder(
+  params: string,
+  state: string
+): Promise<GetOneOrder> {
+  const res = await fetch(`/api/orders/${params}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ state }),
   });
   const data = await res.json();
   return data;

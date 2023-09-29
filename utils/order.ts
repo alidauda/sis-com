@@ -7,6 +7,7 @@ export type Orders = {
     status: string;
     name: string;
     createdAt: string;
+    updatedAt: string;
   }[];
 };
 
