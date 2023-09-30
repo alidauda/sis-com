@@ -3,6 +3,9 @@ import prisma from '@/utils/db';
 import { CartItem, Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 const orderSchema = z.object({
   items: z.array(
     z.object({

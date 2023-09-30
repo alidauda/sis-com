@@ -36,7 +36,8 @@ export default function Page({ params }: { params: { slug: string } }) {
         </Link>
         {data?.order ? (
           data?.order.status === 'COMPLETED' ||
-          data?.order.status === 'REJECTED' ? (
+          data?.order.status === 'REJECTED' ||
+          data.order.status === 'CANCELLED' ? (
             <Button
               type='button'
               id='button'
@@ -52,7 +53,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                 type='button'
                 id='button'
                 className='bg-red-600 hover:bg-red-500'
-                onClick={() => mutate({ state: 'CANCELLED' })}
+                onClick={() => mutate({ state: 'REJECTED' })}
               >
                 Reject Order
               </Button>
