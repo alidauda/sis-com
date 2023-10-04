@@ -7,7 +7,7 @@ export default function AdminStyleWrapper({
 }) {
   return (
     <div className='p-2 m-2 '>
-      <div className='  sm:rounded-lg bg-white'>{children}</div>
+      <div className='  sm:rounded-lg bg-white h-[100dvh] grid'>{children}</div>
     </div>
   );
 }

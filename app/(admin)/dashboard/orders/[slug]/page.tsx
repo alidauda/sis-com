@@ -68,7 +68,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             </div>
           )
         ) : null}
-      </div>{' '}
+      </div>
       <div className='flex p-24 flex-col justify-between overflow-hidden shadow mx-10 my-4'>
         <h1 className='text-center font-medium text-xl'>Order Details</h1>
         <ul className='flex-grow overflow-auto py-4'>

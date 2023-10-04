@@ -1,6 +1,6 @@
 import { getServerAuthSession } from '@/utils/auth';
 import prisma from '@/utils/db';
-import { Prisma } from '@prisma/client';
+import { CartItem, Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { Resend } from 'resend';
@@ -92,4 +92,19 @@ export async function s(req: Request) {
       return NextResponse.json({ error: e }, { status: 404 });
     }
   }
+}
+
+export async function getOrders(id: string) {
+  return await prisma.order.findMany({
+    select: {
+      id: true,
+      userId: true,
+      totalAmount: true,
+      totalQuantity: true,
+      status: true,
+      name: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 }

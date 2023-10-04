@@ -1,15 +1,13 @@
 export type Orders = {
-  orders: {
-    id: string;
-    userId: string;
-    totalAmount: number;
-    totalQuantity: number;
-    status: string;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
-};
+  id: number;
+  userId: string;
+  totalAmount: number;
+  totalQuantity: number;
+  status: 'PENDING' | 'COMPLETED' | 'CANCELLED' | 'REJECTED';
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}[];
 
 export type GetOneOrder = {
   order: {
